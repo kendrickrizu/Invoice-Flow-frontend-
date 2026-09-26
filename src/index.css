@@ -1,0 +1,80 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+@import "tailwindcss";
+
+/* ==========================================================================
+   InvoiceFlow design tokens, registered on Tailwind's theme.
+   Each token below becomes a real utility class (bg-brand-600, font-display,
+   text-md, rounded-stamp, etc) AND stays available as a plain CSS var,
+   e.g. var(--color-brand-600).
+   ========================================================================== */
+@theme {
+  --color-ink-900: #0F2D2E;
+  --color-ink-700: #234642;
+  --color-brand-600: #1B7A6E;
+  --color-brand-500: #23968A;
+  --color-brand-100: #E3F1EE;
+  --color-paper-0: #FFFFFF;
+  --color-paper-50: #FAFAF8;
+  --color-paper-100: #F1F0EA;
+  --color-line: #DEDCD3;
+  --color-line-strong: #C7C6BC;
+  --color-gray-700: #52534C;
+  --color-gray-500: #7C7D74;
+  --color-gray-300: #C7C6BC;
+  --color-success-600: #2F9E6E;
+  --color-success-100: #E1F5EA;
+  --color-warning-600: #C08A1E;
+  --color-warning-100: #FBF0D9;
+  --color-danger-600: #B0453B;
+  --color-danger-100: #F8E3E0;
+
+  --font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
+  --font-body: 'IBM Plex Sans', -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'IBM Plex Mono', 'SF Mono', Consolas, monospace;
+
+  --text-xs: 12px;
+  --text-sm: 13px;
+  --text-base: 15px;
+  --text-md: 17px;
+  --text-lg: 20px;
+  --text-xl: 26px;
+  --text-2xl: 34px;
+  --text-display: 48px;
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 14px;
+  --radius-stamp: 999px;
+
+  --shadow-sm: 0 1px 2px rgba(15, 45, 46, .06);
+  --shadow-md: 0 4px 12px rgba(15, 45, 46, .08);
+  --shadow-lg: 0 12px 32px rgba(15, 45, 46, .12);
+
+  /* spacing scale (sp-1..sp-16) intentionally omitted — the design's 4px
+     base already matches Tailwind's default spacing scale 1:1 (p-6 = 24px,
+     gap-4 = 16px, etc.), so just use Tailwind's built-in numbers. */
+}
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    color: var(--color-ink-900);
+    background: var(--color-paper-50);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    margin: 0;
+  }
+  h1, h2, h3 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin: 0;
+  }
+  a {
+    color: inherit;
+  }
+}
