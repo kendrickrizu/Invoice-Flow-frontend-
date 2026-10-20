@@ -8,7 +8,7 @@ import InvoiceCreate from './pages/InvoiceCreate.jsx'
 import InvoiceDetail from './pages/InvoiceDetail.jsx'
 import AdminAnalytics from './pages/AdminAnalytics.jsx'
 import SettingsBilling from './pages/SettingsBilling.jsx'
-
+import ProtectedRoute from './components/ProtectedRoute.jsx'
 
 export default function App() {
   return (
@@ -16,13 +16,13 @@ export default function App() {
       <Route path="/" element={<Login />} />
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
-      <Route path="/dashboard" element={<Dashboard />} />
-      <Route path="/clients" element={<Clients />} />
-      <Route path="/invoices" element={<Invoices />} />
-      <Route path="/invoices/new" element={<InvoiceCreate />} />
-      <Route path="/invoices/:id" element={<InvoiceDetail />} />
-      <Route path="/admin-analytics" element={<AdminAnalytics />} />
-      <Route path="/settings/billing" element={<SettingsBilling />} />
+      <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+      <Route path="/clients" element={<ProtectedRoute><Clients /></ProtectedRoute>} />
+      <Route path="/invoices" element={<ProtectedRoute><Invoices /></ProtectedRoute>} />
+      <Route path="/invoices/new" element={<ProtectedRoute><InvoiceCreate /></ProtectedRoute>} />
+      <Route path="/invoices/:id" element={<ProtectedRoute><InvoiceDetail /></ProtectedRoute>} />
+      <Route path="/admin-analytics" element={<ProtectedRoute><AdminAnalytics /></ProtectedRoute>} />
+      <Route path="/settings/billing" element={<ProtectedRoute><SettingsBilling /></ProtectedRoute>} />
     </Routes>
   )
 }

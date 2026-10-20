@@ -1,38 +1,44 @@
+import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
 import { btnPrimary, fieldWrap, fieldLabel, fieldInput, fieldHint } from '../styles/ui.js'
 
 export default function Signup() {
-  
   const navigate = useNavigate()
+  const { signUp } = useAuth()
+  const [error, setError] = useState('')
+  const [submitting, setSubmitting] = useState(false)
 
   async function handleSignUp(e) {
-
     e.preventDefault()
-    const form = e.currentTarget
-    const formData = Object.fromEntries(new FormData(form).entries())
-    console.log(formData)
+    setError('')
 
-    if (formData) {
-      try {
-        const response = await fetch(
-          'http://localhost:3000/api/users',
-          {
-            method: 'POST',
-            headers: {'content-Type': 'application/json'},
-            body: JSON.stringify(formData) 
-          }
-        )
-        const data = await response.json()
-        console.log(data.message)
-        
-      } catch (error) {
-        console.log(error)
-      }
+    const form = e.currentTarget
+    const { firstName, lastName, companyName, workEmail, password } =
+      Object.fromEntries(new FormData(form).entries())
+
+    if (password.length < 10 || !/\d/.test(password)) {
+      setError('Password must be at least 10 characters and include a number.')
+      return
+    }
+
+    setSubmitting(true)
+    const { error } = await signUp({
+      email: workEmail,
+      password,
+      firstName,
+      lastName,
+      companyName,
+    })
+    setSubmitting(false)
+
+    if (error) {
+      setError(error.message)
+      return
     }
 
     form.reset()
-    navigate("/dashboard", {replace: true})
-   
+    navigate('/dashboard', { replace: true })
   }
 
   return (
@@ -40,48 +46,52 @@ export default function Signup() {
       <div className="flex items-center justify-center p-8">
         <div className="w-full max-w-[380px]">
           <div className="flex items-center gap-2 mb-10">
-
             <div className="w-[26px] h-[26px] bg-ink-900 rounded-[5px] text-white flex items-center justify-center font-mono text-xs">
               IF
             </div>
             <span className="font-display font-semibold text-md">InvoiceFlow</span>
-            
           </div>
 
           <h1 className="text-2xl mb-2">Create your account</h1>
           <p className="text-gray-500 text-sm mb-8">Free for your first 5 invoices. No card required to start.</p>
 
-          <form onSubmit={(e) => handleSignUp(e)}>
-
+          <form onSubmit={handleSignUp}>
             <div className="grid grid-cols-2 gap-4">
               <div className={fieldWrap}>
-                <label className={fieldLabel}>First name</label>
-                <input name='firstName' className={fieldInput} />
+                <label htmlFor="firstName" className={fieldLabel}>First name</label>
+                <input id="firstName" name="firstName" required className={fieldInput} />
               </div>
 
               <div className={fieldWrap}>
-                <label className={fieldLabel}>Last name</label>
-                <input name='lastName' className={fieldInput} />
+                <label htmlFor="lastName" className={fieldLabel}>Last name</label>
+                <input id="lastName" name="lastName" required className={fieldInput} />
               </div>
             </div>
 
             <div className={fieldWrap}>
-              <label className={fieldLabel}>Company name</label>
-              <input name='companyName' className={fieldInput} />
+              <label htmlFor="companyName" className={fieldLabel}>Company name</label>
+              <input id="companyName" name="companyName" required className={fieldInput} />
             </div>
 
             <div className={fieldWrap}>
-              <label className={fieldLabel}>Work email</label>
-              <input name='workEmail' type="email" className={fieldInput} />
+              <label htmlFor="workEmail" className={fieldLabel}>Work email</label>
+              <input id="workEmail" name="workEmail" type="email" required className={fieldInput} />
             </div>
 
             <div className={fieldWrap}>
-              <label className={fieldLabel}>Password</label>
-              <input name='password' type="password" className={fieldInput} />
+              <label htmlFor="password" className={fieldLabel}>Password</label>
+              <input id="password" name="password" type="password" required className={fieldInput} />
               <span className={fieldHint}>At least 10 characters, one number.</span>
             </div>
 
-            <input type="submit" value="Create Account" className={`${btnPrimary} w-full justify-center mt-2`} />
+            {error && <p className="text-sm text-red-600 mb-2">{error}</p>}
+
+            <input
+              type="submit"
+              value={submitting ? 'Creating account...' : 'Create Account'}
+              disabled={submitting}
+              className={`${btnPrimary} w-full justify-center mt-2`}
+            />
           </form>
 
           <p className="text-center mt-6 text-sm text-gray-500">

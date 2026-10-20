@@ -1,8 +1,34 @@
-import { Link } from 'react-router-dom'
+import { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
 import { btnPrimary, btnSecondary, fieldWrap, fieldLabel, fieldInput } from '../styles/ui.js'
 
-
 export default function Login() {
+  const navigate = useNavigate()
+  const { signIn } = useAuth()
+  const [error, setError] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+
+  async function handleLogin(e) {
+    e.preventDefault()
+    setError('')
+
+    const { email, password } = Object.fromEntries(
+      new FormData(e.currentTarget).entries()
+    )
+
+    setSubmitting(true)
+    const { error } = await signIn({ email, password })
+    setSubmitting(false)
+
+    if (error) {
+      setError(error.message)
+      return
+    }
+
+    navigate('/dashboard', { replace: true })
+  }
+
   return (
     <div className="min-h-screen grid grid-cols-2">
       <div className="flex items-center justify-center p-8">
@@ -17,29 +43,44 @@ export default function Login() {
           <h1 className="text-2xl mb-2">Log in</h1>
           <p className="text-gray-500 text-sm mb-8">Welcome back. Your ledger's exactly how you left it.</p>
 
-          <form>
+          <form onSubmit={handleLogin}>
             <div className={fieldWrap}>
               <label htmlFor="email" className={fieldLabel}>Work email</label>
               <input
                 id="email"
+                name="email"
                 type="email"
+                required
                 placeholder="you@company.com"
-                defaultValue="maya@northwood-studio.com"
                 className={fieldInput}
               />
             </div>
             <div className={fieldWrap}>
               <label htmlFor="pass" className={fieldLabel}>Password</label>
-              <input id="pass" type="password" placeholder="••••••••" defaultValue="••••••••" className={fieldInput} />
+              <input
+                id="pass"
+                name="password"
+                type="password"
+                required
+                placeholder="••••••••"
+                className={fieldInput}
+              />
             </div>
             <div className="flex justify-end mb-6">
               <Link to="#" className="text-brand-600 font-semibold text-xs no-underline">
                 Forgot password?
               </Link>
             </div>
-            <Link to="/dashboard" className={`${btnPrimary} w-full justify-center`}>
-              Log in
-            </Link>
+
+            {error && <p className="text-sm text-red-600 mb-3">{error}</p>}
+
+            <button
+              type="submit"
+              disabled={submitting}
+              className={`${btnPrimary} w-full justify-center`}
+            >
+              {submitting ? 'Logging in...' : 'Log in'}
+            </button>
           </form>
 
           <div className="flex items-center gap-3 text-gray-500 text-xs my-6 before:content-[''] before:flex-1 before:h-px before:bg-line after:content-[''] after:flex-1 after:h-px after:bg-line">

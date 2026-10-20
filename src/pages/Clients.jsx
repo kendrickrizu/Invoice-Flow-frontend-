@@ -4,7 +4,7 @@ import AppShell from '../layouts/AppShell.jsx'
 import formatRawDateString from '../HelperFunctions/formatRawDateString.js'
 import { btnPrimary, btnGhost, card, ledgerTable, ledgerTh, ledgerTd, amount, fieldInput } from '../styles/ui.js'
 import { useData } from '../context/dataContext.jsx'
-
+import { supabase } from '../lib/supabase.js'
 
 export default function Clients() {
 
@@ -15,7 +15,7 @@ export default function Clients() {
   const [clientsArr, setClientsArr] = useState(clients)
   const [isAddClientOpen, setIsAddClientOpen] = useState(false)
 
-    useEffect(() => {
+  useEffect(() => {
     setClientsArr(clients)
   }, [clients])
 
