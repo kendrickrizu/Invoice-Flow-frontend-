@@ -37,6 +37,7 @@ export default function Invoices() {
 
       return matchesTab && matchesSearch
     })
+    
   }, [invoices, activeTab, search])
 
   return (
