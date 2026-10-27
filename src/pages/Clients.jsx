@@ -4,7 +4,6 @@ import AppShell from '../layouts/AppShell.jsx'
 import formatRawDateString from '../HelperFunctions/formatRawDateString.js'
 import { btnPrimary, btnGhost, card, ledgerTable, ledgerTh, ledgerTd, amount, fieldInput } from '../styles/ui.js'
 import { useData } from '../context/dataContext.jsx'
-import { supabase } from '../lib/supabase.js'
 
 export default function Clients() {
 
@@ -23,18 +22,17 @@ export default function Clients() {
     let inputValue = e.target.value.trim().toLowerCase()
 
     const filteredClientsArr = clients.filter(
-      client => client.name.toLowerCase().includes(inputValue)
+      client => (client.name ?? '').toLowerCase().includes(inputValue)
     )
 
     setClientsArr(filteredClientsArr)
-
   }
 
   function getInitials(name) {
     if (!name) return ""
-    
+
     const words = name.trim().split(/\s+/)
-    
+
     if (words.length === 1) {
       return words[0].substring(0, 2).toUpperCase()
     }
@@ -42,28 +40,30 @@ export default function Clients() {
   }
 
   function handleSubmit(e) {
-      e.preventDefault()
+    e.preventDefault()
 
-      const formData = new FormData(e.currentTarget)
-      const newClientFormData = Object.fromEntries(formData.entries())
-      const newClientData = {
-                              ...newClientFormData, 
-                              lifetimeBilled: Number(newClientFormData.lifetimeBilled),
-                              open: Number(newClientFormData.open),
-                              last: formatRawDateString(newClientFormData.last)
-                            }
+    const formData = new FormData(e.currentTarget)
+    const newClientFormData = Object.fromEntries(formData.entries())
+    const newClientData = {
+      ...newClientFormData,
+      lifetimeBilled: Number(newClientFormData.lifetimeBilled),
+      open: Number(newClientFormData.open),
+      last: formatRawDateString(newClientFormData.last)
+    }
 
-      newClientData.id = crypto.randomUUID()
-      newClientData.initials = getInitials(newClientData.name)
-      const updatedClients = [...clients, newClientData]
+    newClientData.id = crypto.randomUUID()
+    newClientData.initials = getInitials(newClientData.name)
+    const updatedClients = [...clients, newClientData]
 
-      setClientsArr(updatedClients)
-      setIsAddClientOpen(false)
+    setClientsArr(updatedClients)
+    setIsAddClientOpen(false)
   }
 
-  const getRecentInvoiceDate = client => {
-    return invoices.filter(invoice => client.name.toLowerCase() === invoice.client.toLowerCase())
-    .sort((a, b) => new Date(b.issueDate) - new Date(a.issueDate))[0].issueDate
+  // Returns the client's most recent invoice, or undefined if they have none
+  const getRecentInvoice = client => {
+    return invoices
+      .filter(invoice => (client.name ?? '').toLowerCase() === (invoice.client ?? '').toLowerCase())
+      .sort((a, b) => new Date(b.issueDate) - new Date(a.issueDate))[0]
   }
 
   return (
@@ -114,7 +114,7 @@ export default function Clients() {
               </div>
 
               <div className="flex flex-col gap-2 mb-4">
-                <label className="text-sm font-semibold text-ink-700" htmlFor="contact">
+                <label className="text-sm font-semibold text-ink-700" htmlFor="email">
                   Email
                 </label>
                 <input
@@ -192,46 +192,64 @@ export default function Clients() {
 
       <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3 mb-5">
         <input placeholder="Search clients…" onInput={(e) => { searchClients(e) }} className={`${fieldInput} w-full sm:w-[280px] py-2.5`} />
-        {clients && <div className="text-gray-500 text-sm">{
-          clientsArr.length} {clientsArr.length > 1 ? 'clients' : 'client'} </div>}
+        <div className="text-gray-500 text-sm">
+          {clientsArr.length} {clientsArr.length === 1 ? 'client' : 'clients'}
+        </div>
       </div>
 
       <div className={`${card} overflow-x-auto`}>
         <table className={`${ledgerTable} min-w-[800px]`}>
           <thead>
             <tr>
-              {
-              ['Client', 'Contact', 'Open Balance', 'Lifetime Billed', 'Last Invoice']
-              .map((h, i) => <th key={i + 23} className={ledgerTh}>{h}</th> )
-              }
+              {['Client', 'Contact', 'Open Balance', 'Lifetime Billed', 'Last Invoice', '']
+                .map((h, i) => <th key={i + 23} className={ledgerTh}>{h}</th>)}
             </tr>
           </thead>
           <tbody>
-            {clientsArr.map((client) => (
-              <tr key={client.name} className="hover:bg-paper-100">
-                <td className={`${ledgerTd} whitespace-nowrap`}>
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 shrink-0 rounded-lg bg-brand-100 text-brand-600 flex items-center justify-center text-xs font-semibold">
-                      {getInitials(client.name)}
-                    </div>
-                    {client.name}
-                  </div>
-                </td>
-                <td className={`${ledgerTd} whitespace-nowrap`}>{client.email}</td>
-                <td className={`${ledgerTd} ${amount} whitespace-nowrap`}>{'$' + client.open.toFixed(2)}</td>
-                <td className={`${ledgerTd} ${amount} whitespace-nowrap`}>
-                  {'$' + invoices.filter(invoice => client.name.toLowerCase() === invoice.client.toLowerCase()).reduce((acc, invoice) => acc + invoice.total , 0 ).toFixed(2)}
-                </td>
-                <td className={`${ledgerTd} whitespace-nowrap`}>
-                  {formatRawDateString(getRecentInvoiceDate(client))}
-                </td>
-                <td className={`${ledgerTd} whitespace-nowrap`}>
-                  <Link to= {"/invoices/" + invoices.find(invoice => getRecentInvoiceDate(client) === invoice.issueDate).id} 
-                    className={btnGhost}>View
-                  </Link>
+            {clientsArr.length === 0 ? (
+              <tr>
+                <td colSpan={6} className={`${ledgerTd} text-center text-gray-500`}>
+                  No clients available.
                 </td>
               </tr>
-            ))}
+            ) : (
+              clientsArr.map((client) => {
+                const recentInvoice = getRecentInvoice(client)
+
+                return (
+                  <tr key={client.id ?? client.name} className="hover:bg-paper-100">
+                    <td className={`${ledgerTd} whitespace-nowrap`}>
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 shrink-0 rounded-lg bg-brand-100 text-brand-600 flex items-center justify-center text-xs font-semibold">
+                          {getInitials(client.name)}
+                        </div>
+                        {client.name}
+                      </div>
+                    </td>
+                    <td className={`${ledgerTd} whitespace-nowrap`}>{client.email}</td>
+                    <td className={`${ledgerTd} ${amount} whitespace-nowrap`}>
+                      {'$' + Number(client.open ?? 0).toFixed(2)}
+                    </td>
+                    <td className={`${ledgerTd} ${amount} whitespace-nowrap`}>
+                      {'$' + invoices
+                        .filter(invoice => (client.name ?? '').toLowerCase() === (invoice.client ?? '').toLowerCase())
+                        .reduce((acc, invoice) => acc + Number(invoice.total), 0)
+                        .toFixed(2)}
+                    </td>
+                    <td className={`${ledgerTd} whitespace-nowrap`}>
+                      {recentInvoice ? formatRawDateString(recentInvoice.issueDate) : '—'}
+                    </td>
+                    <td className={`${ledgerTd} whitespace-nowrap`}>
+                      {recentInvoice && (
+                        <Link to={'/invoices/' + recentInvoice.id} className={btnGhost}>
+                          View
+                        </Link>
+                      )}
+                    </td>
+                  </tr>
+                )
+              })
+            )}
           </tbody>
         </table>
       </div>

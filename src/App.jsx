@@ -9,13 +9,14 @@ import InvoiceDetail from './pages/InvoiceDetail.jsx'
 import AdminAnalytics from './pages/AdminAnalytics.jsx'
 import SettingsBilling from './pages/SettingsBilling.jsx'
 import ProtectedRoute from './components/ProtectedRoute.jsx'
+import PublicRoute from './components/PublicRoute.jsx'
 
 export default function App() {
   return (
     <Routes>
-      <Route path="/" element={<Login />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/signup" element={<Signup />} />
+      <Route path="/" element={<PublicRoute><Login /></PublicRoute>} />
+      <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
+      <Route path="/signup" element={<PublicRoute><Signup /></PublicRoute>} />
       <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
       <Route path="/clients" element={<ProtectedRoute><Clients /></ProtectedRoute>} />
       <Route path="/invoices" element={<ProtectedRoute><Invoices /></ProtectedRoute>} />

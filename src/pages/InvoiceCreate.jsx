@@ -1,4 +1,3 @@
-import {useNavigate } from 'react-router-dom' 
 import { useState } from 'react'
 import AppShell from '../layouts/AppShell.jsx'
 import { btnPrimary, btnSecondary, cardPad, fieldWrap, fieldLabel, fieldInput, lineInput } from '../styles/ui.js'
@@ -16,8 +15,7 @@ const currencies = [ {name: 'USD', sign: '$'}, {name: 'EUR', sign: '€'}, {name
 
 export default function InvoiceCreate() {
 
-  const navigate = useNavigate() 
-  const { clients, fetchInvoices } = useData()
+  const { clients } = useData()
   const [currentIssueDate, setCurrentIssueDate] = useState("")
   const [subTotal, setSubTotal] = useState(0)
   const [newLineItems, setNewLineItems] = useState(lineItems)
@@ -62,51 +60,10 @@ export default function InvoiceCreate() {
     setSubTotal(subtotal)
   }
 
-  async function handleSubmit(e) {
-
+  // Saving is disabled until the database is connected.
+  function handleSubmit(e) {
     e.preventDefault()
-    const action = e.nativeEvent.submitter.value 
-
-    const invoiceDetails = Object.fromEntries(new FormData(e.target).entries())
-    const rows = e.target.querySelector('tbody').querySelectorAll('tr')
-
-    const itemsData = Array.from(rows).map(row => {
-      const inputs = row.querySelectorAll("input")
-      return {
-        description: inputs[0].value,
-        qty: Number(inputs[1].value),
-        rate: Number(inputs[2].value),
-        amount: Number(inputs[1].value) * Number(inputs[2].value)
-      }
-    })
-
-    const newInvoice = {
-      id: invNumber, 
-      client: invoiceDetails.clientName,
-      currency: invoiceDetails.currency,
-      issueDate: invoiceDetails.issueDate,
-      dueDate: invoiceDetails.dueDate,
-      items: itemsData,
-      subTotal: subTotal,
-      total: subTotal + (subTotal * 0.08),
-      status: action === "saveAsDraft" ? 'Draft' : 'Pending'
-    }
-
-    const response = await fetch('http://localhost:3000/api/invoices', {
-      method: "POST",
-      headers: {
-        'Content-Type' : 'application/json'
-      },
-      body: JSON.stringify(newInvoice)
-    })
-
-    const data = await response.json()
-    console.log(data.message)
-    await fetchInvoices()
-    navigate(`/invoices/${action === "saveAsDraft" ? '' : newInvoice.id}`)
-
   }
-
 
   return (
 
@@ -122,8 +79,10 @@ export default function InvoiceCreate() {
             <button 
               type="submit" 
               form="create-invoice-form" 
-              className={btnSecondary}
+              className={`${btnSecondary} disabled:opacity-50 disabled:cursor-not-allowed`}
               value="saveAsDraft"
+              disabled
+              title="Saving is not available yet"
             >
               Save As Draft
             </button>
@@ -131,8 +90,10 @@ export default function InvoiceCreate() {
             <button 
               type="submit" 
               form="create-invoice-form" 
-              className={btnPrimary}
+              className={`${btnPrimary} disabled:opacity-50 disabled:cursor-not-allowed`}
               value="reviewAndSend"
+              disabled
+              title="Saving is not available yet"
             >
               Review & send
             </button>
@@ -143,6 +104,13 @@ export default function InvoiceCreate() {
 
       <div className="flex gap-6">
         <div className="flex-1">
+
+        <div
+          role="status"
+          className="rounded-lg border border-line-strong bg-paper-100 px-4 py-3 text-sm text-gray-700 mb-5"
+        >
+          Saving invoices isn't available yet. You can preview your invoice here, but it won't be stored.
+        </div>
 
         <form id="create-invoice-form" onSubmit={handleSubmit}>
           <div className={`${cardPad} mb-5`}>

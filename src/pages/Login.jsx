@@ -30,8 +30,8 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen grid grid-cols-2">
-      <div className="flex items-center justify-center p-8">
+    <div className="min-h-dvh grid grid-cols-1 md:grid-cols-2">
+      <div className="flex items-center justify-center px-5 py-10 sm:p-8">
         <div className="w-full max-w-[380px]">
           <div className="flex items-center gap-2 mb-10">
             <div className="w-[26px] h-[26px] bg-ink-900 rounded-[5px] text-white flex items-center justify-center font-mono text-xs">
@@ -100,7 +100,7 @@ export default function Login() {
         </div>
       </div>
 
-      <div className="bg-ink-900 text-paper-50 flex flex-col justify-center p-16 relative overflow-hidden">
+      <div className="hidden md:flex bg-ink-900 text-paper-50 flex-col justify-center p-16 relative overflow-hidden">
         <p className="font-display text-xl leading-snug max-w-[420px] font-medium">
           "Every invoice is a promise. InvoiceFlow is where we keep score."
         </p>

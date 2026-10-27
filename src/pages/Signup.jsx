@@ -42,8 +42,8 @@ export default function Signup() {
   }
 
   return (
-    <div className="min-h-screen grid grid-cols-2">
-      <div className="flex items-center justify-center p-8">
+    <div className="min-h-dvh grid grid-cols-1 md:grid-cols-2">
+      <div className="flex items-center justify-center px-5 py-10 sm:p-8">
         <div className="w-full max-w-[380px]">
           <div className="flex items-center gap-2 mb-10">
             <div className="w-[26px] h-[26px] bg-ink-900 rounded-[5px] text-white flex items-center justify-center font-mono text-xs">
@@ -56,7 +56,7 @@ export default function Signup() {
           <p className="text-gray-500 text-sm mb-8">Free for your first 5 invoices. No card required to start.</p>
 
           <form onSubmit={handleSignUp}>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 sm:gap-4">
               <div className={fieldWrap}>
                 <label htmlFor="firstName" className={fieldLabel}>First name</label>
                 <input id="firstName" name="firstName" required className={fieldInput} />
@@ -103,7 +103,7 @@ export default function Signup() {
         </div>
       </div>
 
-      <div className="bg-brand-100 text-ink-900 flex flex-col justify-center p-16">
+      <div className="hidden md:flex bg-brand-100 text-ink-900 flex-col justify-center p-16">
         <h2 className="text-xl max-w-[360px]">Built for people who invoice for a living.</h2>
         <div className="flex flex-col gap-4 mt-8">
           <div className="flex gap-3 items-start text-sm">
